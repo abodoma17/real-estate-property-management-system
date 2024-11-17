@@ -3,19 +3,25 @@
 namespace App\Service;
 
 use App\Entity\Property;
+use App\Event\PropertyDeletedEvent;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use PhpParser\Node\Expr\Array_;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class PropertyService
 {
     private EntityManagerInterface $entityManager;
     private PropertyRepository $propertyRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, PropertyRepository $propertyRepository)
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        PropertyRepository $propertyRepository,
+        EventDispatcherInterface $eventDispatcher
+    )
     {
         $this->entityManager = $entityManager;
         $this->propertyRepository = $propertyRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getAllProperties(): Array
@@ -30,5 +36,15 @@ class PropertyService
         }
 
         return $this->propertyRepository->find($id);
+    }
+
+    public function deleteProperty(Property $property): void
+    {
+        $propertyTitle = $property->getTitle();
+
+//        $this->entityManager->remove($property);
+//        $this->entityManager->flush();
+
+        $this->eventDispatcher->dispatch(new PropertyDeletedEvent($propertyTitle), PropertyDeletedEvent::NAME);
     }
 }

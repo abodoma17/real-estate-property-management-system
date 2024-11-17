@@ -45,4 +45,18 @@ class PropertyController extends AbstractController
 
         return $this->json($property);
     }
+
+    #[Route('/{id}', name: 'property_delete', methods: ["DELETE"])]
+    public function delete(int $id): JsonResponse
+    {
+        $property = $this->propertyService->getPropertyById($id);
+
+        if(!$property) {
+            return $this->json([], Response::HTTP_NOT_FOUND);
+        }
+
+        $this->propertyService->deleteProperty($property);
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
 }
