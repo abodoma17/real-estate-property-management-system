@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\Property;
 use App\Repository\PropertyRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpParser\Node\Expr\Array_;
 
 class PropertyService
 {
@@ -16,8 +18,17 @@ class PropertyService
         $this->propertyRepository = $propertyRepository;
     }
 
-    public function getAllProperties()
+    public function getAllProperties(): Array
     {
         return $this->propertyRepository->findAll();
+    }
+
+    public function getPropertyById(int $id): ?Property
+    {
+        if(!$id) {
+            return null;
+        }
+
+        return $this->propertyRepository->find($id);
     }
 }
