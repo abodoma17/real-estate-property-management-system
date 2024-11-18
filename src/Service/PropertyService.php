@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Entity\Property;
 use App\Event\PropertyCreatedEvent;
 use App\Event\PropertyDeletedEvent;
+use App\Event\PropertyStatusChangedEvent;
+use App\Event\PropertyUpdatedEvent;
 use App\Repository\PropertyRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,17 +16,17 @@ class PropertyService
 {
     private EntityManagerInterface $entityManager;
     private PropertyRepository $propertyRepository;
-    private EventDispatcherInterface $eventDispatcher;
+    private PropertyEventDispatchingService $propertyEventDispatchingService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         PropertyRepository $propertyRepository,
-        EventDispatcherInterface $eventDispatcher
+        PropertyEventDispatchingService $propertyEventDispatchingService
     )
     {
         $this->entityManager = $entityManager;
         $this->propertyRepository = $propertyRepository;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->propertyEventDispatchingService = $propertyEventDispatchingService;
     }
 
     public function getAllProperties(): Array
@@ -48,7 +50,7 @@ class PropertyService
         $this->entityManager->remove($property);
         $this->entityManager->flush();
 
-        $this->eventDispatcher->dispatch(new PropertyDeletedEvent($propertyTitle), PropertyDeletedEvent::NAME);
+        $this->propertyEventDispatchingService->dispatchPropertyDeletedEvent($propertyTitle);
     }
 
     public function createProperty(Property $property): ?Property
@@ -57,8 +59,21 @@ class PropertyService
         $this->entityManager->persist($property);
         $this->entityManager->flush();
 
-        $this->eventDispatcher->dispatch(new PropertyCreatedEvent($property), PropertyCreatedEvent::NAME);
+        $this->propertyEventDispatchingService->dispatchPropertyCreatedEvent($property);
 
         return $property;
+    }
+
+    public function updateProperty(Property $originalProperty, Property $updatedProperty): Property
+    {
+        $this->entityManager->flush();
+
+        $this->propertyEventDispatchingService->dispatchPropertyUpdatedEvent($updatedProperty);
+
+        if($originalProperty->getStatus() !== $updatedProperty->getStatus()) {
+            $this->propertyEventDispatchingService->dispatchPropertyStatusChangedEvent($originalProperty, $updatedProperty);
+        }
+
+        return $updatedProperty;
     }
 }

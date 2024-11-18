@@ -20,6 +20,6 @@ final class PropertyCreatedEventListener
     {
         $property = $event->getProperty();
         
-        $this->logger->info("[PROPERTY CREATED] Property {$property->getTitle()} created at {$property->getCreatedAt()->format('Y/m/d H:i:s')}");
+        $this->logger->info("[PROPERTY CREATED] {$property->getTitle()} created at {$property->getCreatedAt()->format('Y/m/d H:i:s')}");
     }
 }

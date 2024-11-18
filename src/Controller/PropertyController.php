@@ -52,12 +52,12 @@ class PropertyController extends AbstractController
     }
 
     #[Route('/', name: 'property_create', methods: ["POST"])]
-    public function create(Request $request): JsonResponse
+    public function create(): JsonResponse
     {
         $property = new Property();
 
         $form = $this->createForm(PropertyType::class, $property);
-        $form->submit($request->request->all());
+        $form->submit($this->request->request->all());
 
         if ($form->isSubmitted() && $form->isValid()) {
             $property = $this->propertyService->createProperty($property);
@@ -67,6 +67,32 @@ class PropertyController extends AbstractController
         return $this->json([
                 'errors' => $this->formErrorFormatter->getErrorMessages($form)
             ],
+            Response::HTTP_BAD_REQUEST
+        );
+    }
+
+    #[Route('/{id}', name: 'property_update', methods: ["PATCH", "PUT"])]
+    public function update(int $id): JsonResponse
+    {
+        $property = $this->propertyService->getPropertyById($id);
+
+        if(!$property) {
+            return $this->json([], Response::HTTP_NOT_FOUND);
+        }
+
+        $originalProperty = clone $property;
+
+        $form = $this->createForm(PropertyType::class, $property);
+        $form->submit($this->request->request->all(), false);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $property = $this->propertyService->updateProperty($originalProperty, $property);
+            return $this->json($property);
+        }
+
+        return $this->json([
+            'errors' => $this->formErrorFormatter->getErrorMessages($form)
+        ],
             Response::HTTP_BAD_REQUEST
         );
     }
