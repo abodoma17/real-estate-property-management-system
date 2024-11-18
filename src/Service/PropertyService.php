@@ -12,6 +12,7 @@ class PropertyService
 {
     private EntityManagerInterface $entityManager;
     private PropertyRepository $propertyRepository;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -42,8 +43,8 @@ class PropertyService
     {
         $propertyTitle = $property->getTitle();
 
-//        $this->entityManager->remove($property);
-//        $this->entityManager->flush();
+        $this->entityManager->remove($property);
+        $this->entityManager->flush();
 
         $this->eventDispatcher->dispatch(new PropertyDeletedEvent($propertyTitle), PropertyDeletedEvent::NAME);
     }
