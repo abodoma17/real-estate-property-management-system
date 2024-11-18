@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Property;
+use App\Form\PropertyType;
+use App\Service\FormErrorFormatter;
 use App\Service\PropertyService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,14 +18,17 @@ class PropertyController extends AbstractController
 {
     private PropertyService $propertyService;
     private Request $request;
+    private FormErrorFormatter $formErrorFormatter;
 
     public function __construct(
         PropertyService $propertyService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        FormErrorFormatter $formErrorFormatter
     )
     {
         $this->propertyService = $propertyService;
         $this->request = $requestStack->getCurrentRequest();
+        $this->formErrorFormatter = $formErrorFormatter;
     }
 
     #[Route('/', name: 'property_get_all', methods: ["GET"])]
@@ -44,6 +49,26 @@ class PropertyController extends AbstractController
         }
 
         return $this->json($property);
+    }
+
+    #[Route('/', name: 'property_create', methods: ["POST"])]
+    public function create(Request $request): JsonResponse
+    {
+        $property = new Property();
+
+        $form = $this->createForm(PropertyType::class, $property);
+        $form->submit($request->request->all());
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $property = $this->propertyService->createProperty($property);
+            return $this->json($property);
+        }
+
+        return $this->json([
+                'errors' => $this->formErrorFormatter->getErrorMessages($form)
+            ],
+            Response::HTTP_BAD_REQUEST
+        );
     }
 
     #[Route('/{id}', name: 'property_delete', methods: ["DELETE"])]

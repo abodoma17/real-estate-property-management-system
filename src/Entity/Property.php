@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\PropertyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Enums\PropertyStatusEnum;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 #[ORM\Table(
@@ -21,12 +23,16 @@ class Property
         length: 255,
         nullable: false
     )]
+    #[Assert\NotNull(message: "Title is required")]
+    #[Assert\NotBlank(message: "Title can not be blank")]
     private string $title;
 
     #[ORM\Column(
         type: Types::TEXT,
         nullable: false
     )]
+    #[Assert\NotNull(message: "Description is required")]
+    #[Assert\NotBlank(message: "Description can not be blank")]
     private string $description;
 
     #[ORM\Column(
@@ -37,12 +43,15 @@ class Property
             "unsigned" => true
         ]
     )]
+    #[Assert\GreaterThan(0, message: "Price must be greater than 0")]
     private string $price;
 
     #[ORM\Column(
         length: 255,
         nullable: false
     )]
+    #[Assert\NotNull(message: "Location is required")]
+    #[Assert\NotBlank(message: "Location can not be blank")]
     private string $location;
 
     #[ORM\Column(
