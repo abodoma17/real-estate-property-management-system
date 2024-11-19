@@ -45,7 +45,9 @@ class PropertyController extends AbstractController
         $property = $this->propertyService->getPropertyById($id);
 
         if(!$property) {
-            return $this->json([], Response::HTTP_NOT_FOUND);
+            return $this->json([
+                "message" => 'Property not found'
+            ], Response::HTTP_NOT_FOUND);
         }
 
         return $this->json($property);
@@ -61,7 +63,7 @@ class PropertyController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $property = $this->propertyService->createProperty($property);
-            return $this->json($property);
+            return $this->json($property, Response::HTTP_CREATED);
         }
 
         return $this->json([
