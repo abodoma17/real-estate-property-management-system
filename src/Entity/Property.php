@@ -6,7 +6,6 @@ use App\Repository\PropertyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Enums\PropertyStatusEnum;
 
 #[ORM\Entity(repositoryClass: PropertyRepository::class)]
 #[ORM\Table(
@@ -25,7 +24,7 @@ class Property
     )]
     #[Assert\NotNull(message: "Title is required")]
     #[Assert\NotBlank(message: "Title can not be blank")]
-    private string $title;
+    private ?string $title;
 
     #[ORM\Column(
         type: Types::TEXT,
@@ -33,7 +32,7 @@ class Property
     )]
     #[Assert\NotNull(message: "Description is required")]
     #[Assert\NotBlank(message: "Description can not be blank")]
-    private string $description;
+    private ?string $description;
 
     #[ORM\Column(
         type: Types::DECIMAL,
@@ -44,7 +43,7 @@ class Property
         ]
     )]
     #[Assert\GreaterThan(0, message: "Price must be greater than 0")]
-    private string $price;
+    private ?string $price;
 
     #[ORM\Column(
         length: 255,
@@ -52,13 +51,13 @@ class Property
     )]
     #[Assert\NotNull(message: "Location is required")]
     #[Assert\NotBlank(message: "Location can not be blank")]
-    private string $location;
+    private ?string $location;
 
     #[ORM\Column(
         length: 100,
         nullable: false
     )]
-    private string $status;
+    private ?string $status;
 
     #[ORM\Column(
         type: Types::DATETIME_IMMUTABLE,
@@ -71,12 +70,12 @@ class Property
         return $this->id;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    public function setTitle(?string $title): static
     {
         $this->title = $title;
 
@@ -88,43 +87,43 @@ class Property
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function getPrice(): string
+    public function getPrice(): ?string
     {
         return $this->price;
     }
 
-    public function setPrice(string $price): static
+    public function setPrice(?string $price): static
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getLocation(): string
+    public function getLocation(): ?string
     {
         return $this->location;
     }
 
-    public function setLocation(string $location): static
+    public function setLocation(?string $location): static
     {
         $this->location = $location;
 
         return $this;
     }
 
-    public function getStatus(): string
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(?string $status): static
     {
         $this->status = $status;
 
